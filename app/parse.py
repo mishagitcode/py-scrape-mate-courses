@@ -14,13 +14,21 @@ class Course:
     duration: str
 
 
+def safe_text(element: Tag) -> str:
+    return element.get_text(strip=True) if element else ""
+
+
 def parse_single_course(course: Tag) -> Course:
+    name_el = course.select_one("h3.ProfessionCard_title__m7uno")
+    desc_el = course.select_one(
+        "p.ProfessionCard_description__K8weo"
+    )
+    duration_el = course.select_one("p.ProfessionCard_duration__13PwX")
+
     return Course(
-        name=course.select_one("h3.ProfessionCard_title__m7uno").text,
-        short_description=course.select_one(
-            "p.ProfessionCard_description__K8weo"
-        ).text,
-        duration=course.select_one("p.ProfessionCard_duration__13PwX").text
+        name=safe_text(name_el),
+        short_description=safe_text(desc_el),
+        duration=safe_text(duration_el),
     )
 
 
