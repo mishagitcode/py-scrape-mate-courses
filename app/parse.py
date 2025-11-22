@@ -1,5 +1,11 @@
 from dataclasses import dataclass
 
+import requests
+from bs4 import Tag, BeautifulSoup
+
+
+BASE_URL = "https://mate.academy/"
+
 
 @dataclass
 class Course:
@@ -8,5 +14,19 @@ class Course:
     duration: str
 
 
+def parse_single_course(course: Tag) -> Course:
+    return Course(
+        name=course.select_one(".ProfessionCard_title__m7uno").text,
+        short_description=course.select_one(
+            ".ProfessionCard_description__K8weo"
+        ).text,
+        duration=course.select_one(".ProfessionCard_duration__13PwX").text
+    )
+
+
 def get_all_courses() -> list[Course]:
-    pass
+    text = requests.get(BASE_URL).content
+    soup = BeautifulSoup(text, "html.parser")
+    courses = soup.select(".ProfessionCard_cardWrapper__BCg0O")
+
+    return [parse_single_course(course) for course in courses]
